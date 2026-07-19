@@ -1,0 +1,89 @@
+services:
+  laravel-service:
+    container_name: laravel-con
+    build:
+     context: .
+     dockerfile: docker/laravel/Dockerfile
+    working_dir: /var/www/html
+    volumes:
+      - ./laravel-app:/var/www/html
+      - laravel_data:/var/www/html/vendor
+      - ./docker/laravel/entrypoint.development.sh:/usr/local/bin/entrypoint.development.sh
+    ports:
+     - "8000:8000"
+    depends_on:
+     - mysql-service
+    command: ["bash", "/usr/local/bin/entrypoint.development.sh"]
+
+  # vuejs-service:
+  #   container_name: vuejs-con
+  #   build:
+  #     context: .
+  #     dockerfile: docker/vuejs/Dockerfile
+  #   working_dir: /app
+  #   volumes:
+  #    - ./vuejs-app:/app
+  #    - ./docker/vuejs/entrypoint.development.sh:/usr/local/bin/entrypoint.development.sh
+  #   ports:
+  #     - "5173:5173"
+  #   depends_on:
+  #    - laravel-service
+  #   command: ["sh", "/usr/local/bin/entrypoint.development.sh"]
+
+  nextjs-service:
+    container_name: nextjs-con
+    build:
+     context: .
+     dockerfile: docker/nextjs/Dockerfile
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nextjs-app:/app
+      - /app/.next
+      - nextjs_data:/app/node_modules       
+      - ./docker/nextjs/entrypoint.development.sh:/usr/local/bin/entrypoint.development.sh
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
+      - WATCHPACK_INTERVAL=1000
+    depends_on:
+     - laravel-service
+    command: ["sh", "/usr/local/bin/entrypoint.development.sh"]
+  mysql-service:
+   image: mysql:8.0
+   container_name: mysql-con
+   environment:
+      MYSQL_DATABASE: test_mysql
+      MYSQL_USER: test_user
+      MYSQL_PASSWORD: test_password
+      MYSQL_ROOT_PASSWORD: root
+      TZ: UTC
+   volumes:
+     - mysql_data:/var/lib/mysql
+
+  phpmyadmin:
+   image: phpmyadmin:5.2.2
+   container_name: phpmyadmin-con
+   depends_on:
+    - mysql-service
+   environment:
+      UPLOAD_LIMIT: 50M
+      PMA_HOST: mysql-service
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root
+   ports: 
+      - "9000:80"
+volumes:
+  mysql_data:
+  laravel_data:
+  nextjs_data:
+     
+
+
+
+  
