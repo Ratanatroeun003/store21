@@ -19,7 +19,6 @@ export function proxy(request: NextRequest) {
         loginUrl.searchParams.set("redirect", pathname);
         return NextResponse.redirect(loginUrl);
     }
-
     if (isAuthRoute && token) {
         return NextResponse.redirect(new URL("/admin", request.url));
     }

@@ -1,7 +1,8 @@
 // components/admin/ItemTable.tsx
 "use client";
-
+import { Item } from "@/types/item";
 import { Button } from "@/components/ui/button";
+import { DeleteButton } from "../BtnDelete";
 import {
     Table,
     TableBody,
@@ -11,32 +12,13 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash2, Loader2 } from "lucide-react";
-interface UploadImage {
-    url: string;
-    public_id: string;
-}
-interface GameItem {
-    id: number | undefined;
-    status: string;
-    desc: string;
-    price: number | string;
-    images: UploadImage[];
-}
-
+import { Edit } from "lucide-react";
+import { destroy } from "@/app/_actions/item-action";
 interface ItemTableProps {
-    items: GameItem[];
-    isPending: boolean;
-    onEdit: (item: GameItem) => void;
-    onDelete: (item: GameItem) => void;
+    items: Item[];
+    onEdit: (item: Item) => void;
 }
-
-export const ItemTable = ({
-    items,
-    isPending,
-    onEdit,
-    onDelete,
-}: ItemTableProps) => {
+export const ItemTable = ({ items, onEdit }: ItemTableProps) => {
     return (
         <Table>
             <TableCaption className="text-gray-400 pb-4">
@@ -105,23 +87,13 @@ export const ItemTable = ({
                                         variant="ghost"
                                         onClick={() => onEdit(item)}
                                         className="h-8 w-8 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10"
-                                        disabled={isPending}
                                     >
                                         <Edit className="h-4 w-4" />
                                     </Button>
-                                    <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        onClick={() => onDelete(item)}
-                                        className="h-8 w-8 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
-                                        disabled={isPending}
-                                    >
-                                        {isPending ? (
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                        ) : (
-                                            <Trash2 className="h-4 w-4" />
-                                        )}
-                                    </Button>
+                                    <DeleteButton
+                                        id={item.id}
+                                        onDelete={destroy}
+                                    />
                                 </div>
                             </TableCell>
                         </TableRow>

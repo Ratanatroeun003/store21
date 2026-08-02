@@ -1,13 +1,16 @@
-export interface Image {
+export interface ItemImage {
     url: string;
     public_id: string;
+}
+export interface ImageUpload{
+
 }
 export interface Item {
     id: number;
     desc: string;
     price: number;
     status: "available" | "sold";
-    images: Image[];
+    images: ItemImage[];
     created_at?: string;
 }
 export interface ItemPayload {
@@ -15,5 +18,7 @@ export interface ItemPayload {
     desc: string;
     price: number;
     status: "available" | "sold";
-    images: Image[];
+    images: ItemImage[];
 }
+
+

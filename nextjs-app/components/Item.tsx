@@ -4,28 +4,14 @@ import Image from "next/image";
 import { ImageIcon, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-interface ImageObject {
-    url: string;
-    public_id: string;
-}
-
-interface ProductItem {
-    id: number;
-    price: number;
-    status: string;
-    images: ImageObject[];
-    desc?: string;
-}
-interface ItemProps {
-    items: ProductItem[];
-}
-export default function ItemList({ items }: ItemProps) {
+import { ItemImage } from "@/types/item";
+import { Item } from "@/types/item";
+export default function ItemList({ items }: { items: Item[] }) {
     return (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {items.map((item) => {
                 const totalSlots = 12;
-                const displayImages: (ImageObject | string)[] = [
+                const displayImages: (ItemImage | string)[] = [
                     ...item.images,
                 ].slice(0, totalSlots);
                 while (displayImages.length < totalSlots) {
@@ -53,7 +39,6 @@ export default function ItemList({ items }: ItemProps) {
                                             <Image
                                                 src={imgSrc}
                                                 alt={`${item.desc ?? "item"} ${i + 1}`}
-                                                // 🚀 កែសម្រួលត្រង់នេះ៖ ធ្វើ priority លុះត្រាតែជា index 0 និងមានរូបភាពពិតប្រាកដ
                                                 priority={
                                                     i === 0 && imgSrc !== ""
                                                 }

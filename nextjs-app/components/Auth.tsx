@@ -1,9 +1,8 @@
 "use client";
-
 import { useState, useActionState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { login } from "./action";
+import { login } from "@/app/_actions/auth-action";
 import {
     Card,
     CardContent,
@@ -15,18 +14,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2, Mail, Lock, Eye, EyeOff, ArrowLeft } from "lucide-react";
-const initialState = { success: false, message: undefined };
-const LoginPage = () => {
+const initialState = { success: false, message: undefined, isFatal: false };
+const SignIn = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [state, formAction, isPending] = useActionState(login, initialState);
-
     return (
         <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-400 px-4">
             {/* Ambient background glow */}
             <div className="pointer-events-none absolute -top-40 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-600/20 blur-3xl" />
             <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 rounded-full bg-indigo-600/10 blur-3xl" />
             <div className="relative z-10 w-full max-w-sm">
-                {/* Back to home link */}
                 <Link
                     href="/"
                     className="mb-4 inline-flex items-center gap-2 text-sm text-slate-950 transition-colors hover:text-white"
@@ -139,4 +136,4 @@ const LoginPage = () => {
     );
 };
 
-export default LoginPage;
+export default SignIn;

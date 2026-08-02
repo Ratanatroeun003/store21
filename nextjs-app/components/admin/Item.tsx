@@ -1,34 +1,28 @@
 // components/admin/Item.tsx
 "use client";
 import { Plus } from "lucide-react";
-import { Button } from "../ui/button";
-import { useItem } from "@/hooks/useItem";
-import { ItemTable } from "./ItemTable";
-import { ItemForm } from "./ItemForm";
-interface gameItem {
-    id: number;
-    desc: string;
-    price: number | string;
-    status: string;
-    images: string[];
-    created_at?: string;
-}
-interface ItemProps {
-    data: gameItem[];
-}
-const Item = ({ data }: ItemProps) => {
-    const {
-        error,
-        saveItem,
-        remove,
-        loading,
-        message,
-        open,
-        openCreate,
-        selectedItem,
-        openEdit,
-        closeDialog,
-    } = useItem();
+import { Button } from "@/components/ui/button";
+
+import { ItemTable } from "@/components/admin/ItemTable";
+import { ItemForm } from "@/components/admin/ItemForm";
+import { Item } from "@/types/item";
+import { ItemPayload } from "@/types/item";
+import { useState } from "react";
+const Items = ({ items }: { items: Item[] }) => {
+    const [open, setOpen] = useState(false);
+    const [selectedItem, setSelectitem] = useState<ItemPayload | null>(null);
+    const openCreate = () => {
+        setSelectitem(null);
+        setOpen(true);
+    };
+    const openEdit = (item: ItemPayload) => {
+        setSelectitem(item);
+        setOpen(true);
+    };
+    const closeForm = () => {
+        setSelectitem(null);
+        setOpen(false);
+    };
     return (
         <div className="flex flex-col gap-2 mx-auto bg-slate-900 p-4 rounded-lg shadow-lg shadow-slate-950/20 text-white">
             <div className="flex justify-end">
@@ -40,21 +34,12 @@ const Item = ({ data }: ItemProps) => {
                     <span className="font-medium">Create Item</span>
                 </Button>
             </div>
-            <ItemTable
-                items={data}
-                isPending={loading}
-                onEdit={openEdit}
-                onDelete={remove}
-            />
-            <ItemForm
-                open={open}
-                onClose={closeDialog}
-                selectedItem={selectedItem}
-                onSave={saveItem}
-                isPending={loading}
-            />
+            <ItemTable items={items} onEdit={openEdit} />
+            {open && (
+                <ItemForm onClose={closeForm} initialData={selectedItem} />
+            )}
         </div>
     );
 };
 
-export default Item;
+export default Items;

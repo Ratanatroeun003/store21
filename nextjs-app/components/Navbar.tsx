@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, ShieldUser } from "lucide-react";
+import { Menu, ShieldUser, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Sheet,
@@ -11,23 +11,29 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { SITE_CONFIG } from "@/data/site-config";
+import { logout } from "@/app/_actions/auth-action";
 
-export default function Navbar() {
+interface UserType {
+    name: string;
+    email: string;
+    is_admin: boolean;
+}
+
+export default function Navbar({ user }: { user?: UserType | null }) {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
 
     return (
         <nav className="sticky top-0 w-full border-b border-slate-800 bg-slate-200 backdrop-blur-sm z-50 text-slate-950">
             <div className="max-w-7xl mx-auto px-6 h-16 flex justify-between items-center">
-                {/* ឡូហ្គោ */}
                 <Link
                     href="/"
-                    className="text-xl font-bold bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent hover:opacity-80 transition"
+                    className="text-xl font-bold bg-linear-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent hover:opacity-80 transition"
                 >
                     {SITE_CONFIG.name}
                 </Link>
 
-                {/* 💻 Desktop Menu */}
+                {/* ===== DESKTOP MENU ===== */}
                 <div className="hidden md:flex items-center gap-6">
                     <div className="flex gap-1">
                         {SITE_CONFIG.pageLinks.map(
@@ -41,7 +47,7 @@ export default function Navbar() {
                                             }
                                             className={`gap-2 text-sm font-medium text-gray-950 ${
                                                 isActive
-                                                    ? "bg-blue-600 hover:bg-blue-700"
+                                                    ? "bg-blue-600 hover:bg-blue-700 text-white"
                                                     : "hover:text-white hover:bg-blue-600"
                                             }`}
                                         >
@@ -53,33 +59,67 @@ export default function Navbar() {
                             },
                         )}
                     </div>
-                    <Link href="/admin">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            className="gap-1.5 text-blue-400 font-bold border-blue-500/30 bg-blue-500/5 hover:bg-blue-600 hover:text-white transition-all duration-300"
-                        >
-                            <ShieldUser size={14} />
-                            <span>Admin only</span>
-                        </Button>
-                    </Link>
+
+                    {/* 💡 AUTH CONDITION: ឆែកថាមាន User log in ដែរឬទេ */}
+                    {user ? (
+                        <div className="flex items-center gap-3">
+                            {/* ប្រសិនបើជា Admin ឱ្យបង្ហាញ Admin Dashboard Icon */}
+                            {user.is_admin && (
+                                <Link href="/admin">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="gap-1.5 text-blue-600 font-bold border-blue-500/30 bg-blue-500/10 hover:bg-blue-600 hover:text-white transition-all duration-300"
+                                    >
+                                        <ShieldUser size={14} />
+                                        <span>Dashboard</span>
+                                    </Button>
+                                </Link>
+                            )}
+                            <form action={logout}>
+                                <Button
+                                    type="submit"
+                                    variant="destructive"
+                                    size="sm"
+                                    className="gap-1.5 bg-red-600 hover:bg-red-700 text-white"
+                                >
+                                    <LogOut size={14} />
+                                    <span>Logout</span>
+                                </Button>
+                            </form>
+                        </div>
+                    ) : (
+                        <Link href="/auth">
+                            <Button
+                                size="sm"
+                                className="gap-1.5 bg-blue-600 text-white hover:bg-blue-700"
+                            >
+                                <LogIn size={14} />
+                                <span>Login</span>
+                            </Button>
+                        </Link>
+                    )}
                 </div>
+
+                {/* ===== MOBILE MENU ===== */}
                 <div className="flex md:hidden items-center gap-2">
-                    <Link href="/admin">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-blue-400 hover:bg-slate-900"
-                        >
-                            <ShieldUser size={20} />
-                        </Button>
-                    </Link>
+                    {user?.is_admin && (
+                        <Link href="/admin">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-blue-600 hover:bg-slate-300"
+                            >
+                                <ShieldUser size={20} />
+                            </Button>
+                        </Link>
+                    )}
                     <Sheet open={isOpen} onOpenChange={setIsOpen}>
                         <SheetTrigger asChild>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="text-gray-400 hover:text-white hover:bg-slate-900"
+                                className="text-gray-700 hover:text-black hover:bg-slate-300"
                             >
                                 <Menu size={24} />
                             </Button>
@@ -110,7 +150,7 @@ export default function Navbar() {
                                                     className={`w-full justify-start gap-3 py-6 ${
                                                         isActive
                                                             ? "bg-blue-600 text-white"
-                                                            : " hover:text-white hover:bg-blue-700"
+                                                            : "hover:text-white hover:bg-blue-700"
                                                     }`}
                                                 >
                                                     <Icon size={18} />
@@ -120,6 +160,30 @@ export default function Navbar() {
                                         );
                                     },
                                 )}
+                                <div className="mt-4 pt-4 border-t border-slate-300">
+                                    {user ? (
+                                        <form action={logout}>
+                                            <Button
+                                                type="submit"
+                                                variant="destructive"
+                                                className="w-full justify-start gap-3 py-6 bg-red-600 hover:bg-red-700 text-white"
+                                            >
+                                                <LogOut size={18} />
+                                                <span>Logout</span>
+                                            </Button>
+                                        </form>
+                                    ) : (
+                                        <Link
+                                            href="/auth"
+                                            onClick={() => setIsOpen(false)}
+                                        >
+                                            <Button className="w-full justify-start gap-3 py-6 bg-blue-600 text-white hover:bg-blue-700">
+                                                <LogIn size={18} />
+                                                <span>Login</span>
+                                            </Button>
+                                        </Link>
+                                    )}
+                                </div>
                             </div>
                         </SheetContent>
                     </Sheet>

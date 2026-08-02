@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_CONFIG } from "@/data/site-config";
 import { Menu, LogOut } from "lucide-react";
-import { logout } from "@/app/auth/action";
+import { logout } from "@/app/_actions/auth-action";
 import { Button } from "@/components/ui/button";
 import {
     Sheet,
