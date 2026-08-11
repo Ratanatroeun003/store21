@@ -3,28 +3,16 @@
 namespace App\Http\Controllers\API;
 use App\Models\GameItem;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Item\StoreRequest;
+use App\Http\Requests\Item\ItemRequest;
 use App\Http\Resources\Item\ItemResource;
 use Illuminate\Http\Request;
-use Cloudinary\Cloudinary;
+use App\Services\CloudinaryService;
 
 class ItemController extends Controller
 {
-    private $cloudinary;
-
-    public function __construct()
-    {
-        $this->cloudinary = new Cloudinary([
-            'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key'    => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
-            ],
-            'url' => [
-                'secure' => true
-            ]
-        ]);
-    }
+     public function __construct(
+        private CloudinaryService $cloudinary
+     ){}
     function index(Request $request){
         $query = GameItem::with('images');
         if($request->has('status')){
@@ -39,26 +27,32 @@ class ItemController extends Controller
             'items' => ItemResource::collection($items)
         ],200);
     }
-
-
-   public function store(StoreRequest $request)
+   public function store(ItemRequest $request)
     {
-       $data = $request->only(['status', 'desc', 'price']);
-       $item = GameItem::updateOrCreate(
-         ['id' => $request->id], 
-        $data                 
-       );
-        $message = $request->filled('id') ? 'Item updated successfully.' : 'Item created successfully.';
-      if ($request->has('images') && is_array($request->images)) {
+        $item = GameItem::create($request->validated());
+        if ($request->has('images')) {
             $this->syncImages($item, $request->images);
-       }
+        }
         return response([
-            'message' => $message,
-            'item' => new ItemResource($item->load('images')),
-        ], $request->filled('id') ? 200 : 201);
+            'message' => 'Item created successfully',
+            'item' => new ItemResource($item)
+        ], 201);
     }
-
-
+   public function update(ItemRequest $request, $id)
+    {
+        $item = GameItem::with('images')->find($id);
+        if (!$item) {
+            return response(['message' => 'Item not found!'], 404);
+        }
+        $item->update($request->validated());
+        if ($request->has('images')) {
+            $this->syncImages($item, $request->images);
+        }
+        return response([
+            'message' => 'Item updated successfully',
+            'item' => new ItemResource($item)
+        ], 200);
+    }
    public function destroy($id)
    {
     $item = GameItem::with('images')->find($id);
@@ -67,19 +61,13 @@ class ItemController extends Controller
     }
     foreach ($item->images as $image) {
         if ($image->public_id) {
-            try {
-                $this->cloudinary->uploadApi()->destroy($image->public_id);
-            } catch (\Exception $e) {
-                logger("Cloudinary Delete Error on Destroy: " . $e->getMessage());
-            }
+                $this->cloudinary->deleteImage($image->public_id);
         }
     }
     $item->images()->delete();
     $item->delete();
     return response(['message' => 'Item deleted successfully'], 200);
      }
-
-
     function show($id){
         $item = GameItem::with('images')->find($id);
         if(!$item){
@@ -90,8 +78,6 @@ class ItemController extends Controller
             'item'=> new ItemResource($item)
         ],200);
     }
-
-
     private function syncImages(GameItem $item, array $incomingImages): void
     {
         $existingPublicIds = $item->images()->pluck('public_id')->toArray();
@@ -100,7 +86,7 @@ class ItemController extends Controller
         if (!empty($toDeletePublicIds)) {
             foreach ($toDeletePublicIds as $publicId) {
                 try {
-                    $this->cloudinary->uploadApi()->destroy($publicId);
+                   $this->cloudinary->deleteImage($publicId);
                 } catch (\Exception $e) {
                     logger("Cloudinary Delete Error: " . $e->getMessage());
                 }
@@ -109,8 +95,7 @@ class ItemController extends Controller
         }
         foreach ($incomingImages as $image) {
             if (!in_array($image['public_id'], $existingPublicIds)) {
-                [$finalPublicId, $finalUrl] = $this->processCloudinaryImage($image['public_id'], $image['url']);
-
+                [$finalPublicId, $finalUrl] = $this->cloudinary->processTempImage($image['public_id'], $image['url']);
                 $item->images()->create([
                     'public_id' => $finalPublicId,
                     'url'       => $finalUrl,
@@ -118,21 +103,4 @@ class ItemController extends Controller
             }
         }
     }
-
-    
-    function processCloudinaryImage(string $publicId, string $url): array
-    {
-    if (!str_starts_with($publicId, 'temp/')) {
-        return [$publicId, $url];
-    }
-    $fileName = basename($publicId);
-    $finalPublicId = 'game_items/' . $fileName;
-    $finalUrl = str_replace('temp/', 'game_items/', $url);
-    try {
-        $this->cloudinary->uploadApi()->rename($publicId, $finalPublicId);
-    } catch (\Exception $e) {
-        logger("Cloudinary Rename Error: " . $e->getMessage());
-    }
-    return [$finalPublicId, $finalUrl];
-   }
 }

@@ -1,9 +1,7 @@
 export interface ItemImage {
+    id?: number;
     url: string;
     public_id: string;
-}
-export interface ImageUpload{
-
 }
 export interface Item {
     id: number;

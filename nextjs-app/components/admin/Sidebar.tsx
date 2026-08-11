@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { SITE_CONFIG } from "@/data/site-config";
-import { Menu, LogOut } from "lucide-react";
-import { logout } from "@/app/_actions/auth-action";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     Sheet,
@@ -12,15 +11,10 @@ import {
     SheetTrigger,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { useState, useTransition } from "react";
-
+import { useState } from "react";
 export default function Sidebar() {
     const [open, setOpen] = useState(false);
-    const [isPending, startTransition] = useTransition();
     const pathname = usePathname();
-    const handleLogout = () => {
-        startTransition(() => logout());
-    };
     return (
         <aside>
             <div
@@ -73,16 +67,6 @@ export default function Sidebar() {
                         )}
                     </nav>
                 </div>
-                <div className="w-full pt-4 border-t border-slate-900">
-                    <button
-                        onClick={handleLogout}
-                        disabled={isPending}
-                        className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 hover:bg-red-600/90 transition-all duration-200"
-                    >
-                        <LogOut size={18} />
-                        {isPending ? " Logging out..." : "Logout"}
-                    </button>
-                </div>
             </div>
             <div className="md:hidden fixed top-3 left-4 z-50">
                 <Sheet open={open} onOpenChange={setOpen}>
@@ -95,7 +79,6 @@ export default function Sidebar() {
                             <Menu size={22} />
                         </Button>
                     </SheetTrigger>
-
                     <SheetContent
                         side="left"
                         className="w-64 bg-slate-200 border-slate-900 p-5 flex flex-col justify-between"
@@ -140,19 +123,6 @@ export default function Sidebar() {
                                     },
                                 )}
                             </nav>
-                        </div>
-                        <div className="w-full pt-4 border-t border-slate-900">
-                            <button
-                                onClick={() => {
-                                    setOpen(false);
-                                    handleLogout();
-                                }}
-                                disabled={isPending}
-                                className="w-full flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium bg-red-600 hover:bg-red-600/90 transition-all duration-200"
-                            >
-                                <LogOut size={18} />
-                                {isPending ? " Logging out..." : "Logout"}
-                            </button>
                         </div>
                     </SheetContent>
                 </Sheet>

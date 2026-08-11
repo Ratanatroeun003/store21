@@ -1,7 +1,7 @@
 import Item from "@/components/Item";
-import { index } from "../_actions/item-action";
+import { getItems } from "../_actions/item-action";
 const page = async () => {
-    const res = await index();
+    const res = await getItems();
     const items = res.success ? res.items : [];
     return (
         <div className="w-full bg-gray-400 py-12 px-4 min-h-screen antialiased">

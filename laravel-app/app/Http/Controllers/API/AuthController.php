@@ -14,7 +14,6 @@ class AuthController extends Controller
 {
     function signup(SignupRequest $request) 
     {
-      
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -30,7 +29,7 @@ class AuthController extends Controller
         $user = User::where('email',$request -> email)->first();
         if(!Hash::check($request->password,$user->password)){
             throw ValidationException::withMessages([
-                'password'=>"Password dose not match!",
+                'password'=>"Invalid password!",
             ]);
         };
         $token = $user->createToken('auth_token') -> plainTextToken;

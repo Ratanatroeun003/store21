@@ -1,64 +1,71 @@
 'use server'
 import { revalidatePath } from "next/cache";
 import { handleApiError } from "@/lib/api-error";
-import { api } from "@/lib/axios";
-import { Item,ItemImage } from "@/types/item";
-export type FormState = {
-  success: boolean;
-  message: string | null;
-} | null;
-export const index = async ():Promise<{success:boolean,message:string,items:Item[]}> => {
+import {ITEM} from "@/lib/api/item";
+import {ItemInput,itemSchema} from "@/lib/validations/item";
+export const getItems = async () => {
     try {
-        const res = await api.get("/items")
-        return { success: true, items: res.data.items,message:'Data fetched' }
+        const res = await ITEM.getAll();
+        return { 
+          success: true, 
+          items: res.data.items,
+          message:'Successfully fetched items' 
+        }
     } catch (error: any) {
-       handleApiError(error)
+      return handleApiError(error)
     }
 }
-export async function show(
-    id: number
-): Promise<{ success: boolean; message: string; item: Item | null }> {
+export async function getItemById( id: number) {
     try {
-        const response = await api.get(`/items/${id}`);
-        return { success: true, message: "Item fetched", item: response.data.item };
+        const res = await ITEM.getById(id);
+        return {
+           success: true,
+            message: "Item fetched successfully", 
+            item: res.data.item 
+          };
     } catch (error: any) {
-       handleApiError(error)
+      return handleApiError(error)
     }
 }
-export async function store(
-  prevState: FormState,
-  formData: FormData
-): Promise<{success:boolean,message:string}> {
+export async function createItem(
+data:ItemInput
+){
   try {
-    const rawId = formData.get("id");
-    const id = rawId ? Number(rawId) : undefined;
-    const desc = formData.get("desc") as string;
-    const price = Number(formData.get("price"));
-    const status = formData.get("status") as string;
-    const imagesRaw = formData.get("images") as string;
-    const images: ItemImage[] = imagesRaw ? JSON.parse(imagesRaw) : [];
-    if (!desc || isNaN(price) || !status) {
-      return { success: false, message: "All fields are required" };
+    const validation = itemSchema.safeParse(data);
+    if (!validation.success) {
+      return { success: false, message:"Validation failed"};
     }
-  if (images.length === 0) {
-        return { success: false, message: "At least one image is required!" };
-    }
-    await api.post("/items", { id, desc, price, status, images });
-    revalidatePath("/admin/items");
-    return {
-      success: true,
-      message: id ? "Item updated successfully" : "Item created successfully",
-    };
+    await ITEM.create(validation.data);
+    return { success: true, message: "Item created successfully" };
   } catch (error: any) {
-    handleApiError(error)
+   return handleApiError(error)
   }
 }
-export async function destroy(id: number): Promise<{success:boolean,message:string}> {
+export async function updateItem(id: number,
+data:ItemInput
+){
+  try {
+    const validation = itemSchema.safeParse(data);
+    if (!validation.success) {
+      return { success: false, message:"Validation failed"};
+    }else{
+    await ITEM.update(id,validation.data);
+    return {
+       success: true,
+        message: "Item updated successfully" };
+    }
+  } catch (error: any) {
+  return  handleApiError(error)
+  }
+}
+export async function deleteItem(id: number) {
     try {
-        await api.delete(`/items/${id}`);
+        await ITEM.delete(id);
         revalidatePath("/admin/items");
-        return { success: true, message: "Item deleted successfully" };
+        return { 
+        success: true,
+         message: "Item deleted successfully" };
     } catch (error: any) {
-        handleApiError(error)
+      return  handleApiError(error)
   }
 }

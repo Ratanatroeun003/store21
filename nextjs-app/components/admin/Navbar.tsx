@@ -1,5 +1,5 @@
 "use client";
-import { Bell, User } from "lucide-react";
+import { Signout } from "@/components/Signout";
 export default function Navbar() {
     return (
         <header
@@ -21,26 +21,7 @@ export default function Navbar() {
             >
                 Dashboard
             </h2>
-            <div className="flex gap-2">
-                <button
-                    className="
-                text-slate-950
-                hover:text-white
-                "
-                >
-                    <Bell size={20} />
-                </button>
-
-                <div
-                    className="
-                flex items-center gap-2
-                text-slate-950
-                "
-                >
-                    <User size={20} />
-                    <span>Admin</span>
-                </div>
-            </div>
+            <Signout />
         </header>
     );
 }

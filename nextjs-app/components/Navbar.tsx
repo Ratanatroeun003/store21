@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Signout } from "@/components/Signout";
 import { Menu, ShieldUser, LogOut, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,6 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { SITE_CONFIG } from "@/data/site-config";
-import { logout } from "@/app/_actions/auth-action";
 
 interface UserType {
     name: string;
@@ -76,17 +76,7 @@ export default function Navbar({ user }: { user?: UserType | null }) {
                                     </Button>
                                 </Link>
                             )}
-                            <form action={logout}>
-                                <Button
-                                    type="submit"
-                                    variant="destructive"
-                                    size="sm"
-                                    className="gap-1.5 bg-red-600 hover:bg-red-700 text-white"
-                                >
-                                    <LogOut size={14} />
-                                    <span>Logout</span>
-                                </Button>
-                            </form>
+                            <Signout />
                         </div>
                     ) : (
                         <Link href="/auth">
@@ -162,16 +152,7 @@ export default function Navbar({ user }: { user?: UserType | null }) {
                                 )}
                                 <div className="mt-4 pt-4 border-t border-slate-300">
                                     {user ? (
-                                        <form action={logout}>
-                                            <Button
-                                                type="submit"
-                                                variant="destructive"
-                                                className="w-full justify-start gap-3 py-6 bg-red-600 hover:bg-red-700 text-white"
-                                            >
-                                                <LogOut size={18} />
-                                                <span>Logout</span>
-                                            </Button>
-                                        </form>
+                                  <Signout />
                                     ) : (
                                         <Link
                                             href="/auth"

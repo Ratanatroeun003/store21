@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('game_items', function (Blueprint $table) {
             $table->id();
             $table->string('status');
-            $table->text('desc')->nullable();
-            $table->integer('price');
+            $table->text('desc');
+            $table->decimal('price',10,2);
             $table->timestamps();
         });
     }

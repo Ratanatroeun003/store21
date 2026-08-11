@@ -13,7 +13,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { Edit } from "lucide-react";
-import { destroy } from "@/app/_actions/item-action";
+import { deleteItem } from "@/app/_actions/item-action";
 interface ItemTableProps {
     items: Item[];
     onEdit: (item: Item) => void;
@@ -21,27 +21,16 @@ interface ItemTableProps {
 export const ItemTable = ({ items, onEdit }: ItemTableProps) => {
     return (
         <Table>
-            <TableCaption className="text-gray-400 pb-4">
+            <TableCaption className="text-gray-900 pb-4">
                 A list of your warehouse inventory items.
             </TableCaption>
-
-            <TableHeader className="bg-gray-800/50">
-                <TableRow className="border-gray-800 hover:bg-transparent">
-                    <TableHead className="w-24 text-gray-300 font-semibold">
-                        ID
-                    </TableHead>
-                    <TableHead className="text-gray-300 font-semibold">
-                        STATUS
-                    </TableHead>
-                    <TableHead className="text-gray-300 font-semibold">
-                        DESCRIPTION
-                    </TableHead>
-                    <TableHead className="text-right text-gray-300 font-semibold">
-                        PRICE
-                    </TableHead>
-                    <TableHead className="text-center text-gray-300 font-semibold">
-                        ACTION
-                    </TableHead>
+            <TableHeader className="bg-gray-800/50 rounded-md">
+                <TableRow className="text-gray-900 border-slate-200">
+                    <TableHead>ID</TableHead>
+                    <TableHead>STATUS</TableHead>
+                    <TableHead>DESCRIPTION</TableHead>
+                    <TableHead>PRICE</TableHead>
+                    <TableHead>ACTION</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -60,23 +49,21 @@ export const ItemTable = ({ items, onEdit }: ItemTableProps) => {
                             key={item.id}
                             className="border-gray-800 hover:bg-gray-800/30 transition-colors"
                         >
-                            <TableCell className="font-mono font-medium text-blue-400">
+                            <TableCell className="font-mono font-medium text-blue-700">
                                 #{item.id}
                             </TableCell>
                             <TableCell>
                                 <span
                                     className={`px-2 py-0.5 rounded text-xs font-medium border ${
                                         item.status === "available"
-                                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                                            : "bg-red-500/10 text-red-400 border-red-500/20"
+                                            ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20"
+                                            : "bg-red-500/10 text-red-700 border-red-500/20"
                                     }`}
                                 >
                                     {item.status.toUpperCase()}
                                 </span>
                             </TableCell>
-                            <TableCell className="text-gray-300 max-w-xs truncate">
-                                {item.desc}
-                            </TableCell>
+                            <TableCell>{item.desc}</TableCell>
                             <TableCell className="text-right font-medium text-emerald-400">
                                 ${Number(item.price).toFixed(2)}
                             </TableCell>
@@ -86,13 +73,12 @@ export const ItemTable = ({ items, onEdit }: ItemTableProps) => {
                                         size="icon"
                                         variant="ghost"
                                         onClick={() => onEdit(item)}
-                                        className="h-8 w-8 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10"
                                     >
                                         <Edit className="h-4 w-4" />
                                     </Button>
                                     <DeleteButton
                                         id={item.id}
-                                        onDelete={destroy}
+                                        onDelete={deleteItem}
                                     />
                                 </div>
                             </TableCell>

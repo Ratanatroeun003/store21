@@ -1,23 +1,23 @@
 "use server";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { handleApiError } from "@/lib/api-error";
+import { SigninInput,loginSchema } from "@/lib/validations/auth";
 import {AUTH} from "@/lib/api/auth"
-interface LoginState {
+interface SigninState {
     success: boolean;
     message?: string;
 }
-export async function login(
-    prevState: LoginState,
-    formData: FormData
-): Promise<LoginState> {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    if (!email || !password) {
-        return { success: false, message: "Email and password are required" };
+export async function signin(data:SigninInput): Promise<SigninState> {
+   const validation = loginSchema.safeParse(data);
+   if(!validation.success) {
+   return{
+     success: false,
+    message: "invalid input"
     }
+   }
+  const payload = validation.data;
     try {
-        const res = await AUTH.signin({ email, password });
+        const res = await AUTH.signin(payload);
         const token = res.data.token;
         const cookieStore = await cookies();
         cookieStore.set("token", token, {
@@ -27,21 +27,18 @@ export async function login(
           path: "/",
          maxAge: 60 * 60 * 24 * 7, 
       });
-    } catch (error: any) {
-        handleApiError(error)
+      return { success: true, message: "Login successful" };
+    } catch (error: unknown) {
+      return handleApiError(error);
     }
-    redirect("/admin");
 }
-export async function logout() {
+export async function signout() {
     const cookieStore = await cookies();
     const token = cookieStore.get("token")?.value;
     if (token) {
-        try {
-          await AUTH.signout()
-        } catch(error) {
-          handleApiError(error)
-        }
+          await AUTH.signout(token).catch((error) => {
+            console.error("Error during signout:", error);
+       } ) ;
     }
-    cookieStore.delete("token");
-    redirect("/auth");
+cookieStore.delete("token");
 }

@@ -17,6 +17,7 @@ Route::prefix('items')->group(function(){
      Route::get('/{id}',[ItemController::class,'show']);
      Route::middleware('auth:sanctum','is_admin')->group(function(){
         Route::post('/',[ItemController::class,'store']);
+        Route::put('/{id}',[ItemController::class,'update']);
         Route::delete('/{id}',[ItemController::class,'destroy']);
      });
 });

@@ -1,4 +1,3 @@
-// components/admin/Item.tsx
 "use client";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,7 +11,12 @@ const Items = ({ items }: { items: Item[] }) => {
     const [open, setOpen] = useState(false);
     const [selectedItem, setSelectitem] = useState<ItemPayload | null>(null);
     const openCreate = () => {
-        setSelectitem(null);
+        setSelectitem({
+            desc: "",
+            price: 0,
+            status: "available",
+            images: [],
+        });
         setOpen(true);
     };
     const openEdit = (item: ItemPayload) => {
@@ -24,11 +28,11 @@ const Items = ({ items }: { items: Item[] }) => {
         setOpen(false);
     };
     return (
-        <div className="flex flex-col gap-2 mx-auto bg-slate-900 p-4 rounded-lg shadow-lg shadow-slate-950/20 text-white">
+        <div className="flex flex-col gap-2 mx-auto bg-slate-200 p-4 rounded-lg shadow-lg shadow-slate-950/20">
             <div className="flex justify-end">
                 <Button
                     onClick={openCreate}
-                    className="bg-blue-600 hover:bg-blue-700 text-white gap-2 w-fit shadow-lg shadow-blue-500/20"
+                    className="bg-blue-600 hover:bg-blue-700 gap-2 w-fit shadow-lg shadow-blue-500/20"
                 >
                     <Plus className="h-4 w-4" />
                     <span className="font-medium">Create Item</span>
