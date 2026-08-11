@@ -1,4 +1,3 @@
-// components/admin/ItemTable.tsx
 "use client";
 import { Item } from "@/types/item";
 import { Button } from "@/components/ui/button";

@@ -15,7 +15,13 @@ export const ImageUploader = ({
     return (
         <div className="overflow-hidden">
             <label>
-                <Upload className="hover:cursor-pointer" /> upload
+                <p>
+                    {isUploading ? (
+                        "Uploading"
+                    ) : (
+                        <Upload className="hover:cursor-pointer" />
+                    )}
+                </p>
                 <input
                     type="file"
                     multiple
@@ -26,7 +32,6 @@ export const ImageUploader = ({
                     }
                 />
             </label>
-            {isUploading && <p>Uploading...</p>}
             {error && <p className="text-red-500">{error}</p>}
             <div className="scroll-fade-x scrollbar-thin overflow-x-auto">
                 <div className="flex mt-2 mx-auto rounded-2xl gap-2">

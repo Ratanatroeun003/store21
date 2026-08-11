@@ -25,14 +25,14 @@ export function DeleteButton({ id, onDelete }: DeleteButtonProps) {
     const [isPending, startTransition] = useTransition();
 
     const handleDelete = () => {
-        startTransition(() => {
-            toast.promise(onDelete(id), {
-                loading: "Deleting...",
-                success: (res) => {
-                    setOpen(false);
-                    return res.message;
-                },
-            });
+        startTransition(async () => {
+            const res = await onDelete(id);
+            if (res.success) {
+                setOpen(false);
+                toast.success(res.message);
+            } else {
+                toast.error(res.message);
+            }
         });
     };
     return (

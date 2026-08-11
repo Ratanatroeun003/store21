@@ -21,6 +21,5 @@ export const useImageUpload = (onChange: (images: ItemImage[]) => void) => {
   const removeImage = (id: string, currentImages: ItemImage[]) => {
     onChange(currentImages.filter((img) => img.public_id !== id));
   };
-
   return { addImages, removeImage, isUploading, error };
 };

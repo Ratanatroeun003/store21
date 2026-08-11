@@ -1,5 +1,5 @@
 // components/ImagePreview.tsx
-import React from "react";
+import Image from "next/image";
 import { ItemImage } from "@/types/item";
 import { Button } from "../ui/button";
 const ImagePreview = ({
@@ -10,11 +10,13 @@ const ImagePreview = ({
     onRemove: (id: string) => void;
 }) => {
     return (
-        <div className="relative shrink-0 w-20 h-20">
-            <img
+        <div className="relative shrink-0">
+            <Image
                 src={img.url}
                 alt="preview"
-                className="w-full h-full object-cover rounded"
+                width={80}
+                height={100}
+                loading="lazy"
             />
             <Button
                 type="button"
